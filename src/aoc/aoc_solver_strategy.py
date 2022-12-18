@@ -125,6 +125,6 @@ def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) 
     if os.path.exists(input_filepath):
         with open(input_filepath, "r", encoding="utf-8") as file:
             answer = solve_problem_function(file)
-        print(f"Answer={answer}", flush=True)
+        print(f"Answer = {answer}", flush=True)
     else:
         sys.exit(f"ERROR: File {input_filepath} does not exist")
