@@ -11,23 +11,23 @@ def solve_problem_function(input_file: TextIO) -> str:
         line = line.strip()
         (t1, t2) = line.split()
 
-        if t2 == 'X':
+        if t2 == "X":
             score += 1
-            if t1 == 'A':
+            if t1 == "A":
                 score += 3  # Tie
-            elif t1 == 'C':
+            elif t1 == "C":
                 score += 6  # Win
-        elif t2 == 'Y':
+        elif t2 == "Y":
             score += 2
-            if t1 == 'B':
+            if t1 == "B":
                 score += 3  # Tie
-            elif t1 == 'A':
+            elif t1 == "A":
                 score += 6  # Win
         else:
             score += 3
-            if t1 == 'C':
+            if t1 == "C":
                 score += 3  # Tie
-            elif t1 == 'B':
+            elif t1 == "B":
                 score += 6  # Win
 
     return str(score)

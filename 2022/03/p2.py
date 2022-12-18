@@ -7,8 +7,8 @@ from aoc.aoc_solver_strategy import solve_problem
 
 def get_value(char: str) -> int:
     if char.isupper():
-        return ord(char) - ord('A') + 27
-    return ord(char) - ord('a') + 1
+        return ord(char) - ord("A") + 27
+    return ord(char) - ord("a") + 1
 
 
 def solve_problem_function(input_file: TextIO) -> str:
