@@ -107,15 +107,28 @@ def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) 
             test_answer_expected = file.read().strip()
 
         if test_answer_actual != test_answer_expected:
+            if "\n" in test_answer_actual or "\n" in test_answer_expected:
+                sys.exit(
+                    f"FAIL: Test answer=\n{test_answer_actual}\n"
+                    f"      does not match expected=\n"
+                    f"{test_answer_expected}"
+                )
             sys.exit(
                 f"FAIL: Test answer={test_answer_actual} does not match expected="
                 f"{test_answer_expected}"
             )
         else:
-            print(
-                f"PASS: Test answer={test_answer_actual} matches expected={test_answer_expected}",
-                flush=True,
-            )
+            if "\n" in test_answer_actual or "\n" in test_answer_expected:
+                print(
+                    f"PASS: Test answer=\n{test_answer_actual}\n"
+                    f"      matches expected=\n{test_answer_expected}",
+                    flush=True,
+                )
+            else:
+                print(
+                    f"PASS: Test answer={test_answer_actual} matches expected={test_answer_expected}",
+                    flush=True,
+                )
     else:
         if not os.path.exists(test_input_filepath):
             print(f"WARN: File {test_input_filepath} does not exist", flush=True)
@@ -125,6 +138,9 @@ def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) 
     if os.path.exists(input_filepath):
         with open(input_filepath, "r", encoding="utf-8") as file:
             answer = solve_problem_function(file)
-        print(f"Answer = {answer}", flush=True)
+        if "\n" in answer:
+            print(f"\nAnswer =\n{answer}", flush=True)
+        else:
+            print(f"Answer = {answer}", flush=True)
     else:
         sys.exit(f"ERROR: File {input_filepath} does not exist")
