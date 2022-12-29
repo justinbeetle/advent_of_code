@@ -43,4 +43,5 @@ Launch Git Bash and perform the following steps:
 4. Run black: python -m black src 20*
 5. Run mypy: python -m mypy src/aoc/aoc_solver_strategy.py --strict
 6. Run pylint: python -m pylint $(git ls-files 'src/*.py')
+6. Run pytest: python -m pytest
 
