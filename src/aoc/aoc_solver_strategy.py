@@ -4,6 +4,7 @@ from typing import Callable, Optional, TextIO
 
 import os.path
 import sys
+import time
 import urllib.request
 
 
@@ -95,40 +96,42 @@ def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) 
     input_filepath = os.path.join(script_dir, "input.txt")
     test_input_filepath = os.path.join(script_dir, "test_input.txt")
     test_answer_filepath = os.path.join(
-        script_dir, f"test_answer_{os.path.splitext(os.path.basename(script))[0]}.txt"
+        script_dir, f"test_answer_{os.path.splitext(os.path.basename(script))[0].split('_')[0]}.txt"
     )
     __download_input(script_dir, input_filepath)
 
     if os.path.exists(test_input_filepath) and os.path.exists(test_answer_filepath):
+        time_before_s = time.perf_counter()
         with open(test_input_filepath, "r", encoding="utf-8") as file:
             test_answer_actual = solve_problem_function(file)
+        time_elapsed_s = time.perf_counter() - time_before_s
 
         with open(test_answer_filepath, "r", encoding="utf-8") as file:
             test_answer_expected = file.read().strip()
 
-        if test_answer_actual != test_answer_expected:
-            if "\n" in test_answer_actual or "\n" in test_answer_expected:
-                sys.exit(
-                    f"FAIL: Test answer=\n{test_answer_actual}\n"
-                    f"      does not match expected=\n"
-                    f"{test_answer_expected}"
-                )
-            sys.exit(
-                f"FAIL: Test answer={test_answer_actual} does not match expected="
-                f"{test_answer_expected}"
+        is_success = test_answer_actual == test_answer_expected
+        if is_success:
+            prefix = "PASS: Test answer="
+            conjunction = "matches expected="
+        else:
+            prefix = "FAIL: Test answer="
+            conjunction = "does not match expected="
+
+        is_multiline_answer = "\n" in test_answer_actual or "\n" in test_answer_expected
+        if is_multiline_answer:
+            print(
+                f"{prefix}\n{test_answer_actual}\n     {conjunction}\n{test_answer_expected}",
+                flush=True,
             )
         else:
-            if "\n" in test_answer_actual or "\n" in test_answer_expected:
-                print(
-                    f"PASS: Test answer=\n{test_answer_actual}\n"
-                    f"      matches expected=\n{test_answer_expected}",
-                    flush=True,
-                )
-            else:
-                print(
-                    f"PASS: Test answer={test_answer_actual} matches expected={test_answer_expected}",
-                    flush=True,
-                )
+            print(
+                f"{prefix}{test_answer_actual} {conjunction}{test_answer_expected}",
+                flush=True,
+            )
+        print(f"Time elapsed: {time_elapsed_s:0.6f} s", flush=True)
+
+        if not is_success:
+            sys.exit(1)
     else:
         if not os.path.exists(test_input_filepath):
             print(f"WARN: File {test_input_filepath} does not exist", flush=True)
@@ -136,11 +139,16 @@ def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) 
             print(f"WARN: File {test_answer_filepath} does not exist", flush=True)
 
     if os.path.exists(input_filepath):
+        time_before_s = time.perf_counter()
         with open(input_filepath, "r", encoding="utf-8") as file:
             answer = solve_problem_function(file)
-        if "\n" in answer:
-            print(f"\nAnswer =\n{answer}", flush=True)
+        time_elapsed_s = time.perf_counter() - time_before_s
+
+        is_multiline_answer = "\n" in answer
+        if is_multiline_answer:
+            print(f"\nAnswer=\n{answer}", flush=True)
         else:
-            print(f"Answer = {answer}", flush=True)
+            print(f"\nAnswer= {answer}", flush=True)
+        print(f"Time elapsed: {time_elapsed_s:0.6f} s", flush=True)
     else:
         sys.exit(f"ERROR: File {input_filepath} does not exist")

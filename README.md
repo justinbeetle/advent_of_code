@@ -44,4 +44,3 @@ Launch Git Bash and perform the following steps:
 5. Run mypy: python -m mypy src/aoc/*.py --strict
 6. Run pylint: python -m pylint $(git ls-files 'src/*.py')
 6. Run pytest: python -m pytest
-
