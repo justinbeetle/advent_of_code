@@ -96,7 +96,8 @@ def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) 
     input_filepath = os.path.join(script_dir, "input.txt")
     test_input_filepath = os.path.join(script_dir, "test_input.txt")
     test_answer_filepath = os.path.join(
-        script_dir, f"test_answer_{os.path.splitext(os.path.basename(script))[0].split('_')[0]}.txt"
+        script_dir,
+        f"test_answer_{os.path.splitext(os.path.basename(script))[0].split('_')[0]}.txt",
     )
     __download_input(script_dir, input_filepath)
 

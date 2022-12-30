@@ -26,14 +26,17 @@ def a_star(
     coords: List[Point], start: Point, goal: (Point, Point), verbose: bool = False
 ) -> bool:
     """Compute a path from start to goal for an NPC using A* search"""
+
     def h(n: Point) -> float:
         # return abs(goal[0] - n[0]) + abs(goal[1] - n[1]) + abs(goal[2] - n[2])
-        return min(abs(n[0]-goal[0][0]-1),
-                   abs(n[1]-goal[0][1]-1),
-                   abs(n[2]-goal[0][2]-1),
-                   abs(n[0]-goal[1][0]+1),
-                   abs(n[1]-goal[1][1]+1),
-                   abs(n[2]-goal[1][2]+1))
+        return min(
+            abs(n[0] - goal[0][0] - 1),
+            abs(n[1] - goal[0][1] - 1),
+            abs(n[2] - goal[0][2] - 1),
+            abs(n[0] - goal[1][0] + 1),
+            abs(n[1] - goal[1][1] + 1),
+            abs(n[2] - goal[1][2] + 1),
+        )
 
     open_set: List[Tuple[float, Point]] = []
     heappush(open_set, (h(start), start))
@@ -51,7 +54,7 @@ def a_star(
             continue
         if verbose:
             print(f"\tin a_star; current={current}; open_set={open_set}", flush=True)
-        #if current == goal:  # Goal isn't a point
+        # if current == goal:  # Goal isn't a point
         #    break
 
         for neighbor in get_neighbors(current):
@@ -61,22 +64,28 @@ def a_star(
                 if verbose:
                     print(f"\t\t\tin a_star; cannot move to tile", flush=True)
                 continue
-            tentative_g_score = 0  # g_score[current] + 1  # We aren't looking for optimal
+            tentative_g_score = (
+                0  # g_score[current] + 1  # We aren't looking for optimal
+            )
             if verbose:
                 print(
                     f"\t\t\tin a_star; tentative_g_score={tentative_g_score}",
                     flush=True,
                 )
-            if neighbor not in f_score:  # or tentative_g_score < g_score[neighbor]:  # not looking for optimal path
+            if (
+                neighbor not in f_score
+            ):  # or tentative_g_score < g_score[neighbor]:  # not looking for optimal path
                 tentative_f_score = tentative_g_score + h(neighbor)
                 if 0 == tentative_f_score:
-                    return True  # Because we are looking for reachable instead of a path
+                    return (
+                        True  # Because we are looking for reachable instead of a path
+                    )
                 came_from[neighbor] = current
                 # g_score[neighbor] = tentative_g_score
                 f_score[neighbor] = tentative_f_score
                 heappush(open_set, (tentative_f_score, neighbor))
 
-    '''  No longer looking for a path
+    """  No longer looking for a path
     if goal in came_from:
         # Reconstruct the path
         reverse_path = []
@@ -86,7 +95,7 @@ def a_star(
         return list(reversed(reverse_path))
     elif verbose:
         print(f"in a_star; goal is not in came_from={came_from}", flush=True)
-    '''
+    """
 
     # No path exists
     return False
@@ -100,9 +109,9 @@ def solve_problem_function(input_file: TextIO) -> str:
         coords.append((int(x), int(y), int(z)))
     # print(f"coord={coords}")
 
-    x_values = [x for (x,y,z) in coords]
-    y_values = [y for (x,y,z) in coords]
-    z_values = [z for (x,y,z) in coords]
+    x_values = [x for (x, y, z) in coords]
+    y_values = [y for (x, y, z) in coords]
+    z_values = [z for (x, y, z) in coords]
     min_coord = min(x_values), min(y_values), min(z_values)
     max_coord = max(x_values), max(y_values), max(z_values)
     checked_coords = coords[:]
