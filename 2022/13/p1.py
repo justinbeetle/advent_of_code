@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 import ast
 
@@ -31,7 +31,7 @@ def packets_in_order(left, right):
     return None
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     indexes_in_order = []
     pair_idx = 1
     pair = []
@@ -49,7 +49,7 @@ def solve_problem_function(input_file: TextIO) -> str:
             pair_idx += 1
             pair = []
 
-    return str(sum(indexes_in_order))
+    return sum(indexes_in_order)
 
 
 solve_problem(__file__, solve_problem_function)

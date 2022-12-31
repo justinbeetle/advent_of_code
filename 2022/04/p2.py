@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     count = 0
     for line in input_file:
         line = line.strip()
@@ -20,7 +20,7 @@ def solve_problem_function(input_file: TextIO) -> str:
         if not (r1u < r2l or r2u < r1l):
             count += 1
 
-    return str(count)
+    return count
 
 
 solve_problem(__file__, solve_problem_function)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
@@ -17,7 +17,7 @@ def get_neighbors(point):
     return points
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **kwargs: Any) -> Any:
     coords = []
     for line in input_file:
         line = line.strip()

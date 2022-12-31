@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
@@ -11,7 +11,7 @@ def get_value(char: str) -> int:
     return ord(char) - ord("a") + 1
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     sum = 0
     sets = []
     for line in input_file:
@@ -27,7 +27,7 @@ def solve_problem_function(input_file: TextIO) -> str:
                 print(f"s1={sets[0]}; s2={sets[1]}; s3={sets[2]}")
             sets = []
 
-    return str(sum)
+    return sum
 
 
 solve_problem(__file__, solve_problem_function)

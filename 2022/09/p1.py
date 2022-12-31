@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 from aoc.point import Point
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     head_position = Point(0, 0)
     tail_position = Point(0, 0)
     tail_positions = set()
@@ -31,7 +31,7 @@ def solve_problem_function(input_file: TextIO) -> str:
 
             head_position = new_head_position
 
-    return str(len(tail_positions))
+    return len(tail_positions)
 
 
 solve_problem(__file__, solve_problem_function)

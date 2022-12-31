@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     trees = []
     for line in input_file:
         tree_row = []
@@ -42,7 +42,7 @@ def solve_problem_function(input_file: TextIO) -> str:
             score = left * right * up * down
             max_score = max(score, max_score)
 
-    return str(max_score)
+    return max_score
 
 
 solve_problem(__file__, solve_problem_function)

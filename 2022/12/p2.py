@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import TextIO, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, TextIO, Tuple
 
 from heapq import heappush, heappop
 
@@ -95,7 +95,7 @@ def a_star(
     return None
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     grid = []
     starts = []
     end = Point(0, 0)
@@ -122,7 +122,7 @@ def solve_problem_function(input_file: TextIO) -> str:
         else:
             min_path = min(min_path, len(path))
 
-    return str(min_path)
+    return min_path
 
 
 solve_problem(__file__, solve_problem_function)

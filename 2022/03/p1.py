@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
@@ -11,7 +11,7 @@ def get_value(char: str) -> int:
     return ord(char) - ord("a") + 1
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     sum = 0
     for line in input_file:
         line = line.strip()
@@ -28,7 +28,7 @@ def solve_problem_function(input_file: TextIO) -> str:
                 f"line={line}; f={line[:len(line)//2]}; b={line[len(line)//2:]} s1={s1}; s2={s2}"
             )
 
-    return str(sum)
+    return sum
 
 
 solve_problem(__file__, solve_problem_function)

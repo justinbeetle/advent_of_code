@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+from typing import Any, TextIO
+
 import os
-from typing import TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     dirs = {}
     root_path = os.path.normpath("/")
     dirs[root_path] = 0
@@ -38,7 +39,7 @@ def solve_problem_function(input_file: TextIO) -> str:
         if dirs[dir] <= 100000:
             delete_dirs_size += dirs[dir]
 
-    return str(delete_dirs_size)
+    return delete_dirs_size
 
 
 solve_problem(__file__, solve_problem_function)

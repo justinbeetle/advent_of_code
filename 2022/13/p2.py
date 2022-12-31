@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 import ast
 import math
@@ -45,7 +45,7 @@ class Packet:
         return self.value == other.value
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     div_packets = [Packet([[2]]), Packet([[6]])]
     packets = div_packets[:]
     for line in input_file:
@@ -58,7 +58,7 @@ def solve_problem_function(input_file: TextIO) -> str:
     div_packet_indexes = []
     for div_packet in div_packets:
         div_packet_indexes.append(packets.index(div_packet) + 1)
-    return str(math.prod(div_packet_indexes))
+    return math.prod(div_packet_indexes)
 
 
 solve_problem(__file__, solve_problem_function)

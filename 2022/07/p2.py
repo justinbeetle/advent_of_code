@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+from typing import Any, TextIO
+
 import os
-from typing import TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     dirs = {}
     root_path = os.path.normpath("/")
     dirs[root_path] = 0
@@ -42,7 +43,7 @@ def solve_problem_function(input_file: TextIO) -> str:
         if dirs[dir] >= min_delete_space:
             delete_dir_size = min(delete_dir_size, dirs[dir])
 
-    return str(delete_dir_size)
+    return delete_dir_size
 
 
 solve_problem(__file__, solve_problem_function)

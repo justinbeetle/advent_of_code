@@ -1,6 +1,6 @@
 """ Module defining the solve_problem template method """
 
-from typing import Callable, Optional, TextIO
+from typing import Any, Optional, Protocol, TextIO
 
 import os.path
 import sys
@@ -79,32 +79,29 @@ def __download_input(script_dir: str, input_filepath: str) -> None:
         )
 
 
-def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) -> None:
-    """Method implementing a basic strategy for solving Advent of Code problems.
+class SolveProblemFunction(Protocol):
+    """Type definition for callback function"""
 
-    Download the input if input.txt doesn't exist in the script directory.
-    If test_input.txt and test_answer_p#.txt exist, test if the function on the test input.
-    If input.txt exists and the test passed, print the answer obtained from input.txt.
+    def __call__(self, input_file: TextIO, **kwargs: Any) -> Any:
+        pass
 
-    :param script: Calling script filepath
 
-    :param solve_problem_function: Function to solve the problem from an input file
-    """
-
-    # Ensure the input.txt file is present
+def __solve_example_problem(
+    script: str, solve_problem_function: SolveProblemFunction
+) -> None:
+    """Helper method to solve the example problem"""
+    # Determine paths to test input and output
     script_dir = os.path.dirname(script)
-    input_filepath = os.path.join(script_dir, "input.txt")
     test_input_filepath = os.path.join(script_dir, "test_input.txt")
     test_answer_filepath = os.path.join(
         script_dir,
         f"test_answer_{os.path.splitext(os.path.basename(script))[0].split('_')[0]}.txt",
     )
-    __download_input(script_dir, input_filepath)
 
     if os.path.exists(test_input_filepath) and os.path.exists(test_answer_filepath):
         time_before_s = time.perf_counter()
         with open(test_input_filepath, "r", encoding="utf-8") as file:
-            test_answer_actual = solve_problem_function(file)
+            test_answer_actual = str(solve_problem_function(file, is_example=True))
         time_elapsed_s = time.perf_counter() - time_before_s
 
         with open(test_answer_filepath, "r", encoding="utf-8") as file:
@@ -139,10 +136,18 @@ def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) 
         if not os.path.exists(test_answer_filepath):
             print(f"WARN: File {test_answer_filepath} does not exist", flush=True)
 
+
+def __solve_problem(script: str, solve_problem_function: SolveProblemFunction) -> None:
+    """Helper method to solve the actual problem"""
+    # Ensure the input.txt file is present
+    script_dir = os.path.dirname(script)
+    input_filepath = os.path.join(script_dir, "input.txt")
+    __download_input(script_dir, input_filepath)
+
     if os.path.exists(input_filepath):
         time_before_s = time.perf_counter()
         with open(input_filepath, "r", encoding="utf-8") as file:
-            answer = solve_problem_function(file)
+            answer = str(solve_problem_function(file, is_example=False))
         time_elapsed_s = time.perf_counter() - time_before_s
 
         is_multiline_answer = "\n" in answer
@@ -153,3 +158,18 @@ def solve_problem(script: str, solve_problem_function: Callable[[TextIO], str]) 
         print(f"Time elapsed: {time_elapsed_s:0.6f} s", flush=True)
     else:
         sys.exit(f"ERROR: File {input_filepath} does not exist")
+
+
+def solve_problem(script: str, solve_problem_function: SolveProblemFunction) -> None:
+    """Method implementing a basic strategy for solving Advent of Code problems.
+
+    Download the input if input.txt doesn't exist in the script directory.
+    If test_input.txt and test_answer_p#.txt exist, test if the function on the test input.
+    If input.txt exists and the test passed, print the answer obtained from input.txt.
+
+    :param script: Calling script filepath
+
+    :param solve_problem_function: Function to solve the problem from an input file
+    """
+    __solve_example_problem(script, solve_problem_function)
+    __solve_problem(script, solve_problem_function)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import TextIO, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, TextIO, Tuple
 
 from heapq import heappush, heappop
 
@@ -101,7 +101,7 @@ def a_star(
     return False
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **kwargs: Any) -> Any:
     coords = []
     for line in input_file:
         line = line.strip()

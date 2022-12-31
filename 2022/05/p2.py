@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     stacks = []
     for line in input_file:
         if "[" in line:
@@ -14,7 +14,7 @@ def solve_problem_function(input_file: TextIO) -> str:
             while 1 + cnt * 4 < len(line):
                 reduced_line += line[1 + cnt * 4]
                 cnt += 1
-            print(reduced_line)
+            # print(reduced_line)
 
             for idx, char in enumerate(reduced_line):
                 if char == " ":
@@ -22,7 +22,7 @@ def solve_problem_function(input_file: TextIO) -> str:
                 while idx + 1 > len(stacks):
                     stacks.append([])
                 stacks[idx] += [char]
-            print(f"stacks={stacks}")
+            # print(f"stacks={stacks}")
 
         elif line.startswith("move "):
             line = line.strip()
@@ -32,7 +32,7 @@ def solve_problem_function(input_file: TextIO) -> str:
             dest = int(tokens[5]) - 1
             stacks[dest] = stacks[src][:num] + stacks[dest]
             stacks[src] = stacks[src][num:]
-            print(f"after line={line}; stacks={stacks}")
+            # print(f"after line={line}; stacks={stacks}")
 
     top_elements = ""
     for stack in stacks:

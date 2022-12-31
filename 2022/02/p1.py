@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from typing import TextIO
+from typing import Any, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     score = 0
     for line in input_file:
         line = line.strip()
@@ -30,7 +30,7 @@ def solve_problem_function(input_file: TextIO) -> str:
             elif t1 == "B":
                 score += 6  # Win
 
-    return str(score)
+    return score
 
 
 solve_problem(__file__, solve_problem_function)

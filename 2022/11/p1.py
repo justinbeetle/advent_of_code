@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from __future__ import annotations
-from typing import Dict, List, TextIO
+from typing import Any, Dict, List, TextIO
 
 from aoc.aoc_solver_strategy import solve_problem
 
@@ -32,7 +32,7 @@ class Monkey:
         self.items.clear()
 
 
-def solve_problem_function(input_file: TextIO) -> str:
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     monkeys: Dict[Monkey] = {}
 
     for line in input_file:
@@ -58,7 +58,7 @@ def solve_problem_function(input_file: TextIO) -> str:
             # print(f"key={key}; monkeys[key]={monkeys[key].__dict__}")
 
     highest = sorted([x.items_inspected for x in monkeys.values()])[-2:]
-    return str(highest[0] * highest[1])
+    return highest[0] * highest[1]
 
 
 solve_problem(__file__, solve_problem_function)
