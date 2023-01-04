@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from typing import Any, Deque, Dict, List, Set, TextIO, Tuple
+from typing import Any, Deque, Dict, List, Optional, Set, TextIO, Tuple
 
 from collections import deque
+from itertools import combinations, permutations
 import re
 
 from aoc.aoc_solver_strategy import solve_problem
@@ -30,9 +31,88 @@ def compute_distances_to_other_nodes(
     return distances_to_dest_nodes
 
 
+def compute_max_pressure_released(
+    valve_flow_rates: Dict[str, int],
+    start_distances: Dict[str, int],
+    distances_between_valves: Dict[str, Dict[str, int]],
+) -> int:
+    num_workers = 2
+    starting_minutes_remaining = 26
+
+    states_to_check: List[
+        Tuple[List[Tuple[str, int]], Set[str], int]
+    ] = (
+        []
+    )  # Tuples of List of valve position and minutes remaining pairs, valves unopened, and pressure released
+    for combination in combinations(start_distances.keys(), num_workers):
+        worker_states: List[Tuple[str, int]] = []
+        pressure_released = 0
+        for node_name in combination:
+            new_minutes_remaining = (
+                starting_minutes_remaining - start_distances[node_name] - 1
+            )
+            if new_minutes_remaining <= 0:
+                break
+            worker_states.append((node_name, new_minutes_remaining))
+            pressure_released += valve_flow_rates[node_name] * new_minutes_remaining
+
+        if num_workers != len(worker_states):
+            continue
+
+        states_to_check.append(
+            (
+                worker_states,
+                set(valve_flow_rates.keys()) - set(combination),
+                pressure_released,
+            )
+        )
+    # print(f"states_to_check={states_to_check}")
+
+    max_pressure_released = 0
+    while 0 != len(states_to_check):
+        (
+            worker_states,
+            valves_unopened,
+            pressure_released,
+        ) = states_to_check.pop()
+
+        added_to_states_to_check = False
+        for permutation in permutations(valves_unopened, len(worker_states)):
+            new_worker_states: List[Tuple[str, int]] = []
+            new_valves_unopened = valves_unopened.copy()
+            new_pressure_released = pressure_released
+            for (curr_node_name, minutes_remaining), node_name in zip(
+                worker_states, permutation
+            ):
+                distance = distances_between_valves[curr_node_name][node_name]
+                new_minutes_remaining = minutes_remaining - distance - 1
+                if new_minutes_remaining <= 0:
+                    continue
+
+                new_valves_unopened.remove(node_name)
+                new_pressure_released += (
+                    valve_flow_rates[node_name] * new_minutes_remaining
+                )
+                new_worker_states.append((node_name, new_minutes_remaining))
+
+            if 0 != len(new_worker_states):
+                added_to_states_to_check = True
+                states_to_check.append(
+                    (
+                        new_worker_states,
+                        new_valves_unopened,
+                        new_pressure_released,
+                    )
+                )
+
+        if not added_to_states_to_check:
+            max_pressure_released = max(max_pressure_released, pressure_released)
+
+    return max_pressure_released
+
+
 def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     start_node_name = "AA"
-    starting_minutes_remaining = 30
 
     all_connecting_nodes: Dict[str, List[str]] = {}
     valve_flow_rates: Dict[
@@ -47,6 +127,8 @@ def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
             "Valve (\w+) has flow rate=(\d+); tunnel[s]* lead[s]* to valve[s]* (.+)",
             line,
         )
+        if m is None:
+            continue
         node_name = m.group(1)
         valve_flow_rate = int(m.group(2))
         connecting_node_names = [x.strip() for x in m.group(3).split(",")]
@@ -57,71 +139,19 @@ def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
     # print(f"valve_flow_rates={valve_flow_rates}")
 
     start_distances = compute_distances_to_other_nodes(
-        all_connecting_nodes, start_node_name, valve_flow_rates.keys()
+        all_connecting_nodes, start_node_name, list(valve_flow_rates.keys())
     )
     # print(f"start_distances={start_distances}")
     distances_between_valves: Dict[str, Dict[str, int]] = {}
     for node_name in valve_flow_rates:
         distances_between_valves[node_name] = compute_distances_to_other_nodes(
-            all_connecting_nodes, node_name, valve_flow_rates.keys()
+            all_connecting_nodes, node_name, list(valve_flow_rates.keys())
         )
     # print(f"distances_between_valves={distances_between_valves}")
 
-    states_to_check = (
-        []
-    )  # Tuples of valve position, valves opened, minutes remaining, and pressure released
-    for node_name, distance in start_distances.items():
-        new_minutes_remaining = starting_minutes_remaining - distance - 1
-        if new_minutes_remaining <= 0:
-            continue
-
-        states_to_check.append(
-            (
-                node_name,
-                {node_name},
-                new_minutes_remaining,
-                valve_flow_rates[node_name] * new_minutes_remaining,
-            )
-        )
-    # print(f"states_to_check={states_to_check}")
-
-    max_pressure_released = 0
-    while 0 != len(states_to_check):
-        (
-            curr_node_name,
-            valves_opened,
-            min_remaining,
-            pressure_released,
-        ) = states_to_check.pop()
-
-        added_to_states_to_check = False
-        for node_name, distance in distances_between_valves[curr_node_name].items():
-            if node_name in valves_opened:
-                continue
-
-            new_minutes_remaining = min_remaining - distance - 1
-            if new_minutes_remaining <= 0:
-                continue
-
-            new_valves_opened = valves_opened.copy()
-            new_valves_opened.add(node_name)
-            new_pressure_released = (
-                pressure_released + valve_flow_rates[node_name] * new_minutes_remaining
-            )
-            states_to_check.append(
-                (
-                    node_name,
-                    new_valves_opened,
-                    new_minutes_remaining,
-                    new_pressure_released,
-                )
-            )
-            added_to_states_to_check = True
-
-        if not added_to_states_to_check:
-            max_pressure_released = max(max_pressure_released, pressure_released)
-
-    return max_pressure_released
+    return compute_max_pressure_released(
+        valve_flow_rates, start_distances, distances_between_valves
+    )
 
 
 solve_problem(__file__, solve_problem_function)

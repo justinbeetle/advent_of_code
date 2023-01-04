@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from typing import Any, Deque, Dict, List, Set, TextIO, Tuple
+from typing import Any, Deque, Dict, List, Optional, Set, TextIO, Tuple
 
 from collections import deque
 import re
@@ -30,44 +30,16 @@ def compute_distances_to_other_nodes(
     return distances_to_dest_nodes
 
 
-def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
-    start_node_name = "AA"
+def compute_max_pressure_released(
+    valve_flow_rates: Dict[str, int],
+    start_distances: Dict[str, int],
+    distances_between_valves: Dict[str, Dict[str, int]],
+) -> int:
     starting_minutes_remaining = 30
 
-    all_connecting_nodes: Dict[str, List[str]] = {}
-    valve_flow_rates: Dict[
-        str, int
-    ] = {}  # tuples of flow rate and distances to other valves
-    for line in input_file:
-        line = line.strip()
-        if 0 == len(line):
-            continue
-        # print(f"line={line}")
-        m = re.search(
-            "Valve (\w+) has flow rate=(\d+); tunnel[s]* lead[s]* to valve[s]* (.+)",
-            line,
-        )
-        node_name = m.group(1)
-        valve_flow_rate = int(m.group(2))
-        connecting_node_names = [x.strip() for x in m.group(3).split(",")]
-        all_connecting_nodes[node_name] = connecting_node_names
-        if valve_flow_rate > 0:
-            valve_flow_rates[node_name] = valve_flow_rate
-    # print(f"all_connecting_nodes={all_connecting_nodes}")
-    # print(f"valve_flow_rates={valve_flow_rates}")
-
-    start_distances = compute_distances_to_other_nodes(
-        all_connecting_nodes, start_node_name, valve_flow_rates.keys()
-    )
-    # print(f"start_distances={start_distances}")
-    distances_between_valves: Dict[str, Dict[str, int]] = {}
-    for node_name in valve_flow_rates:
-        distances_between_valves[node_name] = compute_distances_to_other_nodes(
-            all_connecting_nodes, node_name, valve_flow_rates.keys()
-        )
-    # print(f"distances_between_valves={distances_between_valves}")
-
-    states_to_check = (
+    states_to_check: List[
+        Tuple[str, Set[str], int, int]
+    ] = (
         []
     )  # Tuples of valve position, valves opened, minutes remaining, and pressure released
     for node_name, distance in start_distances.items():
@@ -90,7 +62,7 @@ def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
         (
             curr_node_name,
             valves_opened,
-            min_remaining,
+            minutes_remaining,
             pressure_released,
         ) = states_to_check.pop()
 
@@ -99,7 +71,7 @@ def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
             if node_name in valves_opened:
                 continue
 
-            new_minutes_remaining = min_remaining - distance - 1
+            new_minutes_remaining = minutes_remaining - distance - 1
             if new_minutes_remaining <= 0:
                 continue
 
@@ -122,6 +94,49 @@ def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
             max_pressure_released = max(max_pressure_released, pressure_released)
 
     return max_pressure_released
+
+
+def solve_problem_function(input_file: TextIO, **_: Any) -> Any:
+    start_node_name = "AA"
+
+    all_connecting_nodes: Dict[str, List[str]] = {}
+    valve_flow_rates: Dict[
+        str, int
+    ] = {}  # tuples of flow rate and distances to other valves
+    for line in input_file:
+        line = line.strip()
+        if 0 == len(line):
+            continue
+        # print(f"line={line}")
+        m = re.search(
+            "Valve (\w+) has flow rate=(\d+); tunnel[s]* lead[s]* to valve[s]* (.+)",
+            line,
+        )
+        if m is None:
+            continue
+        node_name = m.group(1)
+        valve_flow_rate = int(m.group(2))
+        connecting_node_names = [x.strip() for x in m.group(3).split(",")]
+        all_connecting_nodes[node_name] = connecting_node_names
+        if valve_flow_rate > 0:
+            valve_flow_rates[node_name] = valve_flow_rate
+    # print(f"all_connecting_nodes={all_connecting_nodes}")
+    # print(f"valve_flow_rates={valve_flow_rates}")
+
+    start_distances = compute_distances_to_other_nodes(
+        all_connecting_nodes, start_node_name, list(valve_flow_rates.keys())
+    )
+    # print(f"start_distances={start_distances}")
+    distances_between_valves: Dict[str, Dict[str, int]] = {}
+    for node_name in valve_flow_rates:
+        distances_between_valves[node_name] = compute_distances_to_other_nodes(
+            all_connecting_nodes, node_name, list(valve_flow_rates.keys())
+        )
+    # print(f"distances_between_valves={distances_between_valves}")
+
+    return compute_max_pressure_released(
+        valve_flow_rates, start_distances, distances_between_valves
+    )
 
 
 solve_problem(__file__, solve_problem_function)
